@@ -1,4 +1,5 @@
 import maths
+from maths import linear
 
 class SelfAttention:
     def __init__(self, embed_size, num_heads):
@@ -9,3 +10,5 @@ class SelfAttention:
         "The embedding size should be divisible by the number of heads"
 
         self.head_dim = embed_size // num_heads
+
+        self.values = linear(self.embed_size, self.embed_size, bias = None)
