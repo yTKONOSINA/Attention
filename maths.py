@@ -23,8 +23,17 @@ def matmul(A : list, B : list) -> list:
 def ReLU(a : list):
     return [max(0, i) for i in a]
 
-class Linear:
+# Create a class that is similar to a tensor class in PyTorch 
+# which would have all the operations with matrices and tensors
 
+# Create a transpose function for batches
+
+# Create a softmax function
+
+# Create a batch matrix multiplication function
+
+class Linear:
+    # modify it to include batches
     def __init__(self, m : int, n : int, bias : bool = True, 
                  a : float = 0):
         self.m = m
@@ -36,6 +45,9 @@ class Linear:
     def forward(self, x : list) -> list:
         y = matmul(x, self.w)
         return [y[0][i]+ self.bias * self.b[i] for i in range(self.n)]
+
+# Create a permutation function
+# Create a reshaping function
 
 if __name__ == "__main__":
     layer = Linear(3, 2, 1, 2)
