@@ -22,3 +22,9 @@ def matmul(A : list, B : list) -> list:
 
 def ReLU(a : list):
     return [max(0, i) for i in a]
+
+def linear(m : int, n : int, a : float = 0) -> list:
+    return [[a for i in range(n)] for j in range(m)]
+
+if __name__ == "__main__":
+    print(linear(3, 2))
