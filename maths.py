@@ -1,24 +1,5 @@
-def matmul(A : list, B : list) -> list:
-    """
-        Args:
-            Matrix A and B
-        Return:
-            A @ B
-    """
-    m, n = len(A), len(A[0])
-    m1, n1 = len(B), len(B[0])
-    assert n == m1, "cannot multiply matrices, check dimentions"
-
-    res = [
-        [0.0 for i in range(n1)] for j in range(m)
-    ]
-    for i in range(m):
-        for j in range(n1):
-            sum = res[i][j]
-            for k in range(n):
-                sum += A[i][k] * B[k][j]
-            res[i][j] = sum
-    return res
+def softmax():
+    pass
 
 def ReLU(a : list):
     return [max(0, i) for i in a]
@@ -38,9 +19,6 @@ class Linear:
     def forward(self, x : list) -> list:
         y = matmul(x, self.w)
         return [y[0][i]+ self.bias * self.b[i] for i in range(self.n)]
-
-# Create a permutation function
-# Create a reshaping function
 
 if __name__ == "__main__":
     layer = Linear(3, 2, 1, 2)
