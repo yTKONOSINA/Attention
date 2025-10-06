@@ -23,14 +23,7 @@ def matmul(A : list, B : list) -> list:
 def ReLU(a : list):
     return [max(0, i) for i in a]
 
-# Create a class that is similar to a tensor class in PyTorch 
-# which would have all the operations with matrices and tensors
-
-# Create a transpose function for batches
-
 # Create a softmax function
-
-# Create a batch matrix multiplication function
 
 class Linear:
     # modify it to include batches
