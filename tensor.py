@@ -17,7 +17,12 @@ class Tensor:
     def __add__(self, other : "Tensor") -> "Tensor":
         assert (self.shape == other.shape), \
         "The tensors should be the same size"
-        return Tensor()
+        return Tensor(self._add_tensors(self.tensor, other.tensor))
+    
+    def _add_tensors(self, a, b):
+        if not isinstance(a, list):
+            return a + b
+        return [self._add_tensors(x, y) for x, y in zip(a, b)]
 
     # overload @
     # concatination of two tensors
@@ -26,7 +31,7 @@ class Tensor:
     # bmm function
 
 if __name__ == "__main__":
-    a = Tensor([1, 2, 3])
+    a = Tensor([[1, 2], [3, 4]])
     print(a.shape)
-    b = Tensor([4, 5, 6])
-    print(a + b)
+    b = Tensor([[5, 6], [7, 8]])
+    print((a + b).tensor)
