@@ -61,11 +61,44 @@ class Tensor:
     def transpose(self) -> "Tensor":
         pass
     
-    def reshape(self) -> "Tensor":
-        pass
+    def reshape(self, new_shape : tuple) -> "Tensor":
+        """
+            The product of the current shape should be equal to the
+            product of the new shape. 
+            First the tensor is flattened and then it is reshape
+        """
+        total1 = 1
+        for dim in self.shape:
+            total1 *= dim
+        
+        total2 = 1
+        for dim in new_shape:
+            total2 *= dim
+        
+        assert total1 == total2, "Total number of elements must \
+            remain the same!"
+
+        self.flatten(self.tensor)
+        
+
+    def flatten(self) -> "Tensor":
+        
+        def _flatten_list(data):
+            if not isinstance(data, list):
+                return [data]
+            flat = []
+            for item in data:
+                flat.extend(_flatten_list(item))
+            return flat
+        
+        new_list = _flatten_list(self.tensor)
+        self.tensor = new_list
+        self.shape = (len(new_list),)
+        return self
 
     def permute(self, new_shape : tuple) -> "Tensor":
         pass
+
     # bmm function
 
 if __name__ == "__main__":
@@ -74,3 +107,4 @@ if __name__ == "__main__":
     b = Tensor([[5, 6], [7, 8]])
     print((a + b).tensor)
     print((a @ b).tensor)
+    print(a.flatten().shape)
