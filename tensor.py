@@ -75,11 +75,22 @@ class Tensor:
         for dim in new_shape:
             total2 *= dim
         
-        assert total1 == total2, "Total number of elements must \
-            remain the same!"
+        assert total1 == total2, "Total number of elements must remain the same!"
 
-        self.flatten(self.tensor)
+        self.flatten()
         
+        def _reshape(flat_list, shape):
+            if len(shape) == 1:
+                return flat_list[:shape[0]]
+
+            step = len(flat_list) // shape[0]
+            return [_reshape(flat_list[i*step:(i+1)*step], shape[1:])
+                    for i in range(shape[0])]
+            
+        self.tensor = _reshape(self.tensor, new_shape)
+        self.shape = new_shape
+
+        return self
 
     def flatten(self) -> "Tensor":
         
@@ -108,3 +119,5 @@ if __name__ == "__main__":
     print((a + b).tensor)
     print((a @ b).tensor)
     print(a.flatten().shape)
+    a = Tensor([[1, 2], [3, 4], [5, 6], [7, 8]])
+    print(a.reshape((1, 1, 1, 2, 2, 2)).tensor)
