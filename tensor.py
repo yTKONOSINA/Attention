@@ -108,6 +108,12 @@ class Tensor:
         return self
 
     def permute(self, new_shape : tuple) -> "Tensor":
+        """
+            Reorder the dimensions of the tensor
+            Example:
+                x.shape = (1, 2, 3)
+                x.permute((2, 1, 0)) -> (3, 2, 1)
+        """
         pass
 
     # bmm function

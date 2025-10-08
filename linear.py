@@ -13,7 +13,7 @@ class Linear:
         else:
             self.b = None
     
-    def forward(self, x : list) -> list:
+    def forward(self, x : Tensor) -> Tensor:
         y = x @ self.w
         
         # Broadcast the bias to every batch
