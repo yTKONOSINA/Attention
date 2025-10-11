@@ -118,19 +118,40 @@ class Tensor:
         pass
 
     def softmax_dim_0(self) -> "Tensor":
-        out = []
+
+        def exp(x, n_terms=20):
+            result = 0.0
+            factorial = 1
+            power = 1.0
+            for i in range(n_terms):
+                if i > 0:
+                    factorial *= i
+                    power *= x
+                result += power / factorial
+            return result
+
+        ans = []
+        eps = 1e-12
+        for row in self.tensor:
+            max_value = max(row)
+            exps = [exp(x - max_value) for x in row]
+            s = sum(exps)
+            ans.append([e / (s + eps) for e in exps])
+        
+        return Tensor(ans)
 
     # bmm function
 
 if __name__ == "__main__":
-    a = Tensor([[1, 2], [3, 4]])
-    print(a.shape)
-    b = Tensor([[5, 6], [7, 8]])
-    print((a + b).tensor)
-    print((a @ b).tensor)
-    print(a.flatten().shape)
-    a = Tensor([[1, 2], [3, 4], [5, 6], [7, 8]])
-    print(a.reshape((1, 1, 1, 2, 2, 2)).tensor)
+    # a = Tensor([[1, 2], [3, 4]])
+    # print(a.shape)
+    # b = Tensor([[5, 6], [7, 8]])
+    # print((a + b).tensor)
+    # print((a @ b).tensor)
+    # print(a.flatten().shape)
+    # a = Tensor([[1, 2], [3, 4], [5, 6], [7, 8]])
+    # print(a.reshape((1, 1, 1, 2, 2, 2)).tensor)
 
     x = Tensor([[1, 2, 3], [4, 5, 6]])
-    print(x.transpose_2d().tensor)
+    #print(x.transpose_2d().transpose_2d().tensor)
+    print(x.softmax_dim_0().tensor)
