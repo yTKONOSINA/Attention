@@ -7,9 +7,9 @@ state = model.state_dict()
 
 attention_weights = {}
 for k, v in state.items():
-    if "attention" in k:
-        print(k, v.shape)
-        attention_weights[k] = v.detach().cpu().numpy().tolist()
+    #if "attention" in k:
+    print(k, v.shape)
+    attention_weights[k] = v.detach().cpu().numpy().tolist()
 
 # encoder.layer.0.attention.self.query.weight torch.Size([128, 128])
 # encoder.layer.0.attention.self.query.bias torch.Size([128])

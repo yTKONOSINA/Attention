@@ -1,9 +1,9 @@
 import maths
-from linear import Linear
+from Layers.linear import Linear
 from tensor import Tensor
 import json
 
-class SelfAttention:
+class Attention:
     def __init__(self, embed_size, num_heads):
         self.embed_size = embed_size
         self.num_heads = num_heads
@@ -13,19 +13,23 @@ class SelfAttention:
 
         self.head_dim = embed_size // num_heads
 
-        self.values = Linear(self.embed_size, self.embed_size, bias = 0)
-        self.keys = Linear(self.embed_size, self.embed_size, bias = 0)
-        self.queries = Linear(self.embed_size, self.embed_size, bias = 0)
+        self.values = Linear(self.embed_size, self.embed_size)
+        self.keys = Linear(self.embed_size, self.embed_size)
+        self.queries = Linear(self.embed_size, self.embed_size)
         # one more layer here for the output for cantatination of the heads
 
     def forward(self, values, keys, queries, mask):
         N = queries.shape[0]
 
+        # Q = XW_q + b_q, K = XW_k + b_k, V = XW_v + b_v
         values = self.values.forward(values)
         keys = self.keys.forward(keys)
         queries = self.queries.forward(queries)
 
         value_len, key_len, query_len = values.shape[1], keys.shape[1], queries.shape[1]
+
+        # Attention(Q, K, V) = softmax(QK^t/sqrt(d_k))V
+        # Output = Attention(Q, K, W)W_o + b_o
 
         values = values.reshape((N, value_len, self.num_heads, self.head_dim))
         keys = keys.reshape((N, key_len, self.num_heads, self.head_dim))
