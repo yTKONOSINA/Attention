@@ -10,12 +10,16 @@ class LayerNorm:
         """
             LN(x) = (x - mean) / sqrt(std^2 + eps) * weight + bias
         """
-        res = []
+
+        assert len(x.shape) == 3, "the input should be a batch"
+
         eps = 1e-12
-        for row in x.tensor:
+        
+        def norm_row(row):
             mean = sum(row)/len(row)
             var = sum((x - mean)**2 for x in row)/len(row)
-            res.append([(x - mean)/((var + eps)**0.5) * w + b
-                        for x, w, b in zip(row, self.w.tensor, self.b.tensor)])
+            std = (var + eps) ** 0.5
+            return [(x - mean) / std * w + b
+                        for x, w, b in zip(row, self.w.tensor, self.b.tensor)]
 
-        return Tensor(res)
+        return Tensor([[norm_row(row) for row in sample] for sample in x.tensor])

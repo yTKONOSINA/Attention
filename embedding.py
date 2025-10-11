@@ -1,6 +1,7 @@
 from transformers import BertTokenizer, AutoModel
 from copy import deepcopy
 from tensor import Tensor
+from Layers.layernorm import LayerNorm
 
 # embeddings.word_embeddings.weight torch.Size([30522, 128])
 # embeddings.position_embeddings.weight torch.Size([512, 128])
@@ -12,7 +13,8 @@ tokenizer = BertTokenizer.from_pretrained("prajjwal1/bert-tiny")
 model = AutoModel.from_pretrained("prajjwal1/bert-tiny")
 embedding_weights = model.embeddings.word_embeddings.weight.detach().cpu().numpy().tolist()  # shape (30522,128)
 
-def embed(sentences : list[str]) -> Tensor:
+def embed(sentences : list[str],
+          ) -> Tensor:
     tokens = tokenizer.tokenize(sentence)
     ids = tokenizer.convert_tokens_to_ids(tokens)
     embeddings = Tensor([deepcopy(embedding_weights[i]) for i in ids])
