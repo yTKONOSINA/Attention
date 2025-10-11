@@ -12,9 +12,8 @@ tokenizer = BertTokenizer.from_pretrained("prajjwal1/bert-tiny")
 model = AutoModel.from_pretrained("prajjwal1/bert-tiny")
 embedding_weights = model.embeddings.word_embeddings.weight.detach().cpu().numpy().tolist()  # shape (30522,128)
 
-def embed(sentence : str) -> Tensor:
+def embed(sentences : list[str]) -> Tensor:
     tokens = tokenizer.tokenize(sentence)
     ids = tokenizer.convert_tokens_to_ids(tokens)
     embeddings = Tensor([deepcopy(embedding_weights[i]) for i in ids])
 
-    

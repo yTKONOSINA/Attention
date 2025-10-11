@@ -1,4 +1,7 @@
-from embedding
-from attention
+from embedding import embed
+from attention import Attention
 
-sentence = sentence = "the man went to the [MASK] . he bought a gallon of milk."
+sentences = [
+    "the man went to the [MASK] . he bought a gallon of milk.",
+    "i wrote this passage with a [MASK]"
+]
