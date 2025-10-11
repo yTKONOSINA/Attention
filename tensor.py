@@ -58,14 +58,15 @@ class Tensor:
     def cat(self, other : "Tensor") -> "Tensor":
         pass
 
-    def transpose(self) -> "Tensor":
-        pass
+    def transpose_2d(self) -> "Tensor":
+        assert len(self.shape) == 2, "Only transpose 2d tensors"
+        return Tensor([list(row) for row in zip(*self.tensor)])
     
     def reshape(self, new_shape : tuple) -> "Tensor":
         """
             The product of the current shape should be equal to the
             product of the new shape. 
-            First the tensor is flattened and then it is reshape
+            First the tensor is flattened and then it is reshaped
         """
         total1 = 1
         for dim in self.shape:
@@ -116,6 +117,9 @@ class Tensor:
         """
         pass
 
+    def softmax_dim_0(self) -> "Tensor":
+        out = []
+
     # bmm function
 
 if __name__ == "__main__":
@@ -127,3 +131,6 @@ if __name__ == "__main__":
     print(a.flatten().shape)
     a = Tensor([[1, 2], [3, 4], [5, 6], [7, 8]])
     print(a.reshape((1, 1, 1, 2, 2, 2)).tensor)
+
+    x = Tensor([[1, 2, 3], [4, 5, 6]])
+    print(x.transpose_2d().tensor)
