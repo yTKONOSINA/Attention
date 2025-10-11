@@ -1,6 +1,7 @@
 import maths
-from maths import Linear
+from linear import Linear
 from tensor import Tensor
+import json
 
 class SelfAttention:
     def __init__(self, embed_size, num_heads):
@@ -36,3 +37,10 @@ class SelfAttention:
 
         # To be continued ...
         return
+    
+
+if __name__ == "__main__":
+    with open("weights/bert_tiny_attention_weights.json", 'r') as f:
+        w = json.load(f)
+    for name, weights in w.items():
+        print(len(weights[0]))
