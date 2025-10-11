@@ -1,10 +1,10 @@
 from tensor import Tensor
 
 class LayerNorm:
-    def __init__(self, n : int, data : float = 0):
+    def __init__(self, n : int, w : Tensor, b : Tensor):
         self.m = n
-        self.w = Tensor([data for i in range(n)])
-        self.b = Tensor([data for i in range(n)])
+        self.w = w
+        self.b = b
 
     def forward(self, x : Tensor) -> Tensor:
         """
