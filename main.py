@@ -28,12 +28,12 @@ inputs = tokenizer(
 )
 
 tokens_list = inputs['input_ids'].tolist()
-token_type_ids = input['token_type_ids'].tolist()
+token_type_list = inputs['token_type_ids'].tolist()
 
 # Since we are working with batches, we have to pad each sentence to the longest
 # one and create an output mask, otherwise the attention layer would consider
 # these padded elements
-mask = input['attention_mask'].tolist() 
+mask = inputs['attention_mask'].tolist() 
 
 # Get embedding weights
 with open("weights/embeddings.json", "r") as f:
@@ -49,4 +49,4 @@ embeddings = embed(tokens_list,
                    Tensor(embeddings_dict['bert.embeddings.LayerNorm.bias']) 
                 )
 
-print(embeddings)
+print(embeddings.shape) # (batch, num of tokens, embedding dim = 128)

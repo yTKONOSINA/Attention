@@ -13,25 +13,13 @@ def embed(tokens : list[list[int]],
           ) -> Tensor:
 
     batch_embs = []
-
-    max_len = max(len(sample) for sample in tokens)
-
     for ids, types in zip(tokens, token_type):
-        seq_len = len(ids)
-        
-        assert len(ids) == len(types), "the length must match"
-        
-        # Padding each sample in the batch
-        if seq_len < max_len:
-            pad_len = max_len - seq_len
-            ids = ids + [0] * pad_len
-            types = types + [0] * pad_len
 
         # Word embeddings
         word_emb = Tensor([list(word_embeddings.tensor[i]) for i in ids])  # (seq_len, hidden)
 
         # Positional embeddings
-        pos_emb = Tensor([list(pos_embeddings.tensor[i]) for i in range(max_len)])
+        pos_emb = Tensor([list(pos_embeddings.tensor[i]) for i in range(len(tokens[0]))])
 
         # Type embeddings
         type_emb = Tensor([list(type_embeddings.tensor[t]) for t in types])
@@ -40,7 +28,6 @@ def embed(tokens : list[list[int]],
         batch_embs.append((word_emb + pos_emb + type_emb).tensor)
     
     # batch layer norm
-
     x = Tensor(batch_embs)
 
     ln = LayerNorm(
