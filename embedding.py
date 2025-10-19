@@ -3,12 +3,6 @@ from copy import deepcopy
 from tensor import Tensor
 from Layers.layernorm import LayerNorm
 
-# embeddings.word_embeddings.weight torch.Size([30522, 128])
-# embeddings.position_embeddings.weight torch.Size([512, 128])
-# embeddings.token_type_embeddings.weight torch.Size([2, 128])
-# embeddings.LayerNorm.weight torch.Size([128])
-# embeddings.LayerNorm.bias torch.Size([128])
-
 def embed(tokens : list[list[int]],
           token_type : list[list[int]],
           word_embeddings: Tensor,
@@ -19,9 +13,6 @@ def embed(tokens : list[list[int]],
           ) -> Tensor:
 
     batch_embs = []
-
-    model = AutoModelForMaskedLM.from_pretrained("prajjwal1/bert-tiny")
-    embedding_weights = model.embeddings.word_embeddings.weight.detach().cpu().numpy().tolist()  # shape (30522,128)
 
     max_len = max(len(sample) for sample in tokens)
 

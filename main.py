@@ -1,7 +1,8 @@
 from transformers import AutoTokenizer # Only tokenizer
 from embedding import embed
 from attention import Attention
-
+from tensor import Tensor
+import json
 
 sentences = [
     "How are [MASK]?",
@@ -16,19 +17,14 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 tokens_list = []
 token_type_list = []
-# word_embeddings: Tensor,
-#           pos_embeddings: Tensor,
-#           type_embeddings : Tensor,
-#           layernorm_weight: Tensor,
-#           layernorm_bias: Tensor,
 
 # max token length is 512
 # Tokenize with padding to the longest sentence
 inputs = tokenizer(
     sentences,
     return_tensors="pt",
-    padding=True,        # pads to longest sentence in batch
-    truncation=True      # truncate if too long (optional)
+    padding=True,
+    truncation=True
 )
 
 tokens_list = inputs['input_ids'].tolist()
@@ -39,9 +35,18 @@ token_type_ids = input['token_type_ids'].tolist()
 # these padded elements
 mask = input['attention_mask'].tolist() 
 
+# Get embedding weights
+with open("weights/embeddings.json", "r") as f:
+    embeddings_dict = json.load(f)
 
-# Create a separate file, which imports the model and 
 # Get embeddings
+embeddings = embed(tokens_list,
+                   token_type_list,
+                   Tensor(embeddings_dict["bert.embeddings.word_embeddings.weight"]),
+                   Tensor(embeddings_dict['bert.embeddings.position_embeddings.weight']),
+                   Tensor(embeddings_dict['bert.embeddings.token_type_embeddings.weight']),
+                   Tensor(embeddings_dict['bert.embeddings.LayerNorm.weight']),
+                   Tensor(embeddings_dict['bert.embeddings.LayerNorm.bias']) 
+                )
 
-# Get the results 
-
+print(embeddings)
