@@ -1,12 +1,12 @@
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer # Only tokenizer
 from embedding import embed
 from attention import Attention
 
 
 sentences = [
-#    "the man went to the [MASK] . he bought a gallon of milk.",
-#    "i wrote this passage with a [MASK]",
-    "how are [MASK]?"
+    "How are [MASK]?",
+    "It is a [MASK] day.",
+    "He is a good [MASK]."
 ]
 
 # Loading the model and the tokenizer
@@ -14,21 +14,34 @@ model_name = "prajjwal1/bert-tiny"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 # model = AutoModelForMaskedLM.from_pretrained(model_name)
 
+tokens_list = []
+token_type_list = []
+# word_embeddings: Tensor,
+#           pos_embeddings: Tensor,
+#           type_embeddings : Tensor,
+#           layernorm_weight: Tensor,
+#           layernorm_bias: Tensor,
+
 # max token length is 512
-for sentence in sentences:
-    # Tokenizer
-    # Return a batch (# sentences, # different lengths)
-    tokens = tokenizer(sentence, return_tensors = "pt")
+# Tokenize with padding to the longest sentence
+inputs = tokenizer(
+    sentences,
+    return_tensors="pt",
+    padding=True,        # pads to longest sentence in batch
+    truncation=True      # truncate if too long (optional)
+)
+
+tokens_list = inputs['input_ids'].tolist()
+token_type_ids = input['token_type_ids'].tolist()
+
+# Since we are working with batches, we have to pad each sentence to the longest
+# one and create an output mask, otherwise the attention layer would consider
+# these padded elements
+mask = input['attention_mask'].tolist() 
 
 
-    print(tokens)
-    token_type_ids = [[0] * len(sentence)]
-
+# Create a separate file, which imports the model and 
 # Get embeddings
-# 1. First, get the weights from the model (the only part where we have to 
-# use the tranformer library)
-# Get 
-model = AutoModel.from_pretrained("prajjwal1/bert-tiny")
-embedding_weights = model.embeddings.word_embeddings.weight.detach().cpu().numpy().tolist()  # shape (30522,128)
 
 # Get the results 
+

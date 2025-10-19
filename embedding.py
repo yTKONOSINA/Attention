@@ -1,3 +1,4 @@
+from transformers import AutoModelForMaskedLM
 from copy import deepcopy
 from tensor import Tensor
 from Layers.layernorm import LayerNorm
@@ -18,6 +19,9 @@ def embed(tokens : list[list[int]],
           ) -> Tensor:
 
     batch_embs = []
+
+    model = AutoModelForMaskedLM.from_pretrained("prajjwal1/bert-tiny")
+    embedding_weights = model.embeddings.word_embeddings.weight.detach().cpu().numpy().tolist()  # shape (30522,128)
 
     max_len = max(len(sample) for sample in tokens)
 

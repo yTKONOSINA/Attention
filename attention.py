@@ -38,7 +38,7 @@ class Attention:
         #queries = queries.permute((0, 2, 1, 3)).reshape(N * self.num_heads, query_len, self.head_dim)
         #keys = keys.permute(0, 2, 1, 3).reshape(N * self.heads, key_len, self.head_dim)
 
-
+        # I must incorporate mask, otherwise the model would consider it
         # To be continued ...
         return
     
