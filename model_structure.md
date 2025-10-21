@@ -12,6 +12,7 @@ bert.encoder.layer.0.attention.self.value.weight torch.Size([128, 128])
 bert.encoder.layer.0.attention.self.value.bias torch.Size([128])
 bert.encoder.layer.0.attention.output.dense.weight torch.Size([128, 128])
 bert.encoder.layer.0.attention.output.dense.bias torch.Size([128])
+
 bert.encoder.layer.0.attention.output.LayerNorm.weight torch.Size([128])
 bert.encoder.layer.0.attention.output.LayerNorm.bias torch.Size([128])
 bert.encoder.layer.0.intermediate.dense.weight torch.Size([512, 128])

@@ -3,20 +3,20 @@ from Layers.linear import Linear
 from tensor import Tensor
 import json
 
-class Attention:
-    def __init__(self, embed_size, num_heads):
-        self.embed_size = embed_size
+class BertSelfAttention:
+    def __init__(self, hidden_size, num_heads):
+        assert hidden_size % num_heads == 0, "hidden_size must be divisible by num_heads"
+        self.hidden_size = hidden_size
         self.num_heads = num_heads
+        self.head_dim = hidden_size // num_heads
 
-        assert (self.embed_size % self.num_heads == 0), \
-        "The embedding size should be divisible by the number of heads"
+        # Linear projections
+        self.query = Linear(hidden_size, hidden_size)
+        self.key = Linear(hidden_size, hidden_size)
+        self.value = Linear(hidden_size, hidden_size)
 
-        self.head_dim = embed_size // num_heads
-
-        self.values = Linear(self.embed_size, self.embed_size)
-        self.keys = Linear(self.embed_size, self.embed_size)
-        self.queries = Linear(self.embed_size, self.embed_size)
-        # one more layer here for the output for cantatination of the heads
+        # Output projection
+        self.dense = Linear(hidden_size, hidden_size)
 
     def forward(self, values, keys, queries, mask):
         N = queries.shape[0]
@@ -42,9 +42,9 @@ class Attention:
         # To be continued ...
         return
     
+class BertLayer:
+    def __init__(self):
+        pass
 
-if __name__ == "__main__":
-    with open("weights/bert_tiny_attention_weights.json", 'r') as f:
-        w = json.load(f)
-    for name, weights in w.items():
-        print(len(weights[0]))
+    def _load_weight(self):
+        pass

@@ -1,6 +1,6 @@
 from transformers import AutoTokenizer # Only tokenizer
 from embedding import embed
-from attention import Attention
+from Layers.attention import Attention
 from tensor import Tensor
 import json
 
@@ -50,3 +50,7 @@ embeddings = embed(tokens_list,
                 )
 
 print(embeddings.shape) # (batch, num of tokens, embedding dim = 128)
+
+at_layer_1 = Attention()
+
+at_layer_2 = Attention()
