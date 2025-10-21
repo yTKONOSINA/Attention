@@ -2,6 +2,7 @@ import maths
 from Layers.linear import Linear
 from tensor import Tensor
 import json
+from layernorm import LayerNorm
 
 class BertSelfAttention:
     def __init__(self, hidden_size, num_heads):
@@ -43,8 +44,47 @@ class BertSelfAttention:
         return
     
 class BertLayer:
-    def __init__(self):
-        pass
+    def __init__(self, 
+                 hidden_size = 128, 
+                 intermediate_size = 512, 
+                 num_heads = 2,
+                 layer_num = 0,
+                 weight_file = 'weight/encoder.json'):
+        
+        self.attention = BertSelfAttention(hidden_size, num_heads)
+        self.attention_norm = LayerNorm(hidden_size)
 
-    def _load_weight(self):
-        pass
+        self.intermediate = Linear(hidden_size, intermediate_size)
+        self.output_dense = Linear(intermediate_size, hidden_size)
+        self.output_norm = LayerNorm(hidden_size)
+        
+        self._load_weights(weight_file, layer_num)
+
+    def _load_weights(self, weight_file, layer_num):
+        with open(weight_file, "r") as f:
+            weights = json.load(f)
+
+        prefix = f"bert.encoder.layer.{layer_num}."
+
+        # Attention
+        self.attention.query.weight = Tensor(weights[prefix + "attention.self.query.weight"])
+        self.attention.query.bias = Tensor(weights[prefix + "attention.self.query.bias"])
+        self.attention.key.weight = Tensor(weights[prefix + "attention.self.key.weight"])
+        self.attention.key.bias = Tensor(weights[prefix + "attention.self.key.bias"])
+        self.attention.value.weight = Tensor(weights[prefix + "attention.self.value.weight"])
+        self.attention.value.bias = Tensor(weights[prefix + "attention.self.value.bias"])
+        self.attention.dense.weight = Tensor(weights[prefix + "attention.output.dense.weight"])
+        self.attention.dense.bias = Tensor(weights[prefix + "attention.output.dense.bias"])
+
+        self.attention_norm.weight = Tensor(weights[prefix + "attention.output.LayerNorm.weight"])
+        self.attention_norm.bias = Tensor(weights[prefix + "attention.output.LayerNorm.bias"])
+
+        # Feed-forward
+        self.intermediate.weight = Tensor(weights[prefix + "intermediate.dense.weight"])
+        self.intermediate.bias = Tensor(weights[prefix + "intermediate.dense.bias"])
+
+        self.output_dense.weight = Tensor(weights[prefix + "output.dense.weight"])
+        self.output_dense.bias = Tensor(weights[prefix + "output.dense.bias"])
+
+        self.output_norm.weight = Tensor(weights[prefix + "output.LayerNorm.weight"])
+        self.output_norm.bias = Tensor(weights[prefix + "output.LayerNorm.bias"])
