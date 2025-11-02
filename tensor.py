@@ -190,6 +190,14 @@ class Tensor:
 
     # bmm function
 
+    def transpose(self, dim1 : int, dim2 : int) -> "Tensor":
+        dims = list(range(len(self.shape)))
+        dims[dim1], dims[dim2] = dims[2], dims[1]
+        return self.permute(tuple(dims))
+    
+    def softmax(self, dim : int = -1) -> "Tensor":
+        
+
 if __name__ == "__main__":
     # a = Tensor([[1, 2], [3, 4]])
     # print(a.shape)
