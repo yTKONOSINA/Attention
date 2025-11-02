@@ -1,5 +1,3 @@
-from transformers import AutoModelForMaskedLM
-from copy import deepcopy
 from tensor import Tensor
 from Layers.layernorm import LayerNorm
 

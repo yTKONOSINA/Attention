@@ -19,28 +19,28 @@ class BertSelfAttention:
         # Output projection
         self.dense = Linear(hidden_size, hidden_size)
 
-    def forward(self, values, keys, queries, mask):
-        N = queries.shape[0]
+    def forward(self, X, mask):
+        N, length, _ = X.shape
 
         # Q = XW_q + b_q, K = XW_k + b_k, V = XW_v + b_v
-        values = self.values.forward(values)
-        keys = self.keys.forward(keys)
-        queries = self.queries.forward(queries)
-
-        value_len, key_len, query_len = values.shape[1], keys.shape[1], queries.shape[1]
+        values = self.values.forward(X)
+        keys = self.keys.forward(X)
+        queries = self.queries.forward(X)
 
         # Attention(Q, K, V) = softmax(QK^t/sqrt(d_k))V
         # Output = Attention(Q, K, W)W_o + b_o
 
-        values = values.reshape((N, value_len, self.num_heads, self.head_dim))
-        keys = keys.reshape((N, key_len, self.num_heads, self.head_dim))
-        queries = queries.reshape((N, query_len, self.num_heads, self.head_dim))
+        values = values.reshape((N, length, self.num_heads, self.head_dim))
+        keys = keys.reshape((N, length, self.num_heads, self.head_dim))
+        queries = queries.reshape((N, length, self.num_heads, self.head_dim))
 
         #queries = queries.permute((0, 2, 1, 3)).reshape(N * self.num_heads, query_len, self.head_dim)
         #keys = keys.permute(0, 2, 1, 3).reshape(N * self.heads, key_len, self.head_dim)
 
         # I must incorporate mask, otherwise the model would consider it
         # To be continued ...
+        # dense layer
+        # layer norm
         return
     
 class BertLayer:
@@ -88,3 +88,15 @@ class BertLayer:
 
         self.output_norm.weight = Tensor(weights[prefix + "output.LayerNorm.weight"])
         self.output_norm.bias = Tensor(weights[prefix + "output.LayerNorm.bias"])
+    
+
+    def forward(self, hidden_states, mask=None):
+        # Self-Attention + residual
+        attn_out = self.attention.forward(hidden_states, mask)
+        hidden_states = self.attention_norm.forward(hidden_states + attn_out)
+
+        # Feed-Forward + residual
+        ff_out = self.output_dense.forward(self.intermediate.forward(hidden_states))
+        hidden_states = self.output_norm.forward(hidden_states + ff_out)
+
+        return hidden_states

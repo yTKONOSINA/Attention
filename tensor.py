@@ -108,14 +108,62 @@ class Tensor:
         self.shape = (len(new_list),)
         return self
 
-    def permute(self, new_shape : tuple) -> "Tensor":
+    def permute(self, dims : tuple) -> "Tensor":
         """
             Reorder the dimensions of the tensor
             Example:
                 x.shape = (1, 2, 3)
                 x.permute((2, 1, 0)) -> (3, 2, 1)
+            Supports tensors only up to 4 dimensions
         """
-        pass
+        assert len(dims) == len(self.shape), \
+        "The number of dimensions must match"
+
+        assert sorted(dims) == list(range(len(dims))), \
+        "dims must be a permuation of tensor axes"
+
+        if len(dims) == 2:
+            if dims == (1, 0):
+                return self.transpose_2d()
+            return self
+    
+        if len(dims) == 3:
+            new_shape = tuple(self.shape[i] for i in dims)
+            new_tensor = [[[0 for _ in range(new_shape[2])]
+                           for _ in range(new_shape[1])]
+                           for _ in range(new_shape[0])]
+
+            for i in range(new_shape[0]):
+                for j in range(new_shape[1]):
+                    for k in range(new_shape[2]):
+                        old_idx = [i, j, k]
+                        old_i = old_idx[dims.index(0)]
+                        old_j = old_idx[dims.index(1)]
+                        old_k = old_idx[dims.index(2)]
+                        new_tensor[i][j][k] = self.tensor[old_i][old_j][old_k]
+            return Tensor(new_tensor)
+
+        if len(dims) == 4:
+            new_shape = tuple(self.shape[i] for i in dims)
+            new_tensor = [[[[0 for _ in range(new_shape[3])]
+                            for _ in range(new_shape[2])]
+                            for _ in range(new_shape[1])]
+                            for _ in range(new_shape[0])]
+
+            for i in range(new_shape[0]):
+                for j in range(new_shape[1]):
+                    for k in range(new_shape[2]):
+                        for l in range(new_shape[3]):
+                            old_idx = [i, j, k, l]
+                            old_i = old_idx[dims.index(0)]
+                            old_j = old_idx[dims.index(1)]
+                            old_k = old_idx[dims.index(2)]
+                            old_l = old_idx[dims.index(3)]
+                            new_tensor[i][j][k][l] = self.tensor[old_i][old_j][old_k][old_l]
+            return Tensor(new_tensor)
+
+        raise NotImplementedError("permute supports up to 4D tensors only.")
+
 
     def softmax_dim_0(self) -> "Tensor":
 

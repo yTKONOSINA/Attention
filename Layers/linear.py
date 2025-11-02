@@ -1,7 +1,6 @@
 from tensor import Tensor
 
 class Linear:
-    # modify it to include batches
     def __init__(self, m : int, n : int, data : float = 0):
         self.m = m
         self.n = n
