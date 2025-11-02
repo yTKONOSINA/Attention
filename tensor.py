@@ -202,6 +202,17 @@ class Tensor:
         else:
             return Tensor(apply_softmax(self.tensor, 0, dim))
 
+    def masked_fill(self, mask: "Tensor", value: float) -> "Tensor":
+        """
+            Replaces elements where mask == 0 with 'value'
+        """
+        def fill(data, mask_data):
+            if not isinstance(data, list):
+                return value if not mask_data else data
+            return [fill(d, m) for d, m in zip(data, mask_data)]
+
+        return Tensor(fill(self.tensor, mask.tensor))
+
 if __name__ == "__main__":
     # a = Tensor([[1, 2], [3, 4]])
     # print(a.shape)
