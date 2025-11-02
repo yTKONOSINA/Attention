@@ -1,4 +1,5 @@
 import maths
+import math
 from Layers.linear import Linear
 from tensor import Tensor
 import json
@@ -34,11 +35,20 @@ class BertSelfAttention:
         keys = keys.reshape((N, length, self.num_heads, self.head_dim))
         queries = queries.reshape((N, length, self.num_heads, self.head_dim))
 
-        #queries = queries.permute((0, 2, 1, 3)).reshape(N * self.num_heads, query_len, self.head_dim)
-        #keys = keys.permute(0, 2, 1, 3).reshape(N * self.heads, key_len, self.head_dim)
+        queries = queries.permute((0, 2, 1, 3))
+        keys = keys.permute((0, 2, 1, 3))
+        values = values.permute((0, 2, 1, 3))
+        
+        scores = (queries @ keys.transpose_2d(-2, -1)) / math.sqrt(self.head_dim)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, float("-inf"))
+        attention = scores.softmax(dim=-1)
 
-        # I must incorporate mask, otherwise the model would consider it
-        # To be continued ...
+        output = attention @ values
+        output = output.permute((0, 2, 1, 3)).reshape(N, length, self.hidden_size)
+
+        dense = Linear()
+    
         # dense layer
         # layer norm
         return
