@@ -1,10 +1,20 @@
 from tensor import Tensor
+import random
 
 class LayerNorm:
-    def __init__(self, n : int, w : Tensor, b : Tensor):
+    def __init__(self,
+                 n : int,
+                 w : list = None,
+                 b : list = None):
         self.m = n
-        self.w = w
-        self.b = b
+        if w:
+            self.w = Tensor(w)
+        else:
+            self.w = Tensor(random.random() for _ in range(n))
+        if b:
+            self.b = Tensor(b)
+        else:
+            self.b = Tensor([random.random() for _ in range(n)])
 
     def forward(self, x : Tensor) -> Tensor:
         """

@@ -55,10 +55,10 @@ bert_layer_0 = BertLayer(hidden_size = 128,
                          intermediate_size = 512,
                          num_heads = 2,
                          layer_num = 0,
-                         weight_file='weight/encoder.json')
+                         weight_file='weights/encoder.json')
 
 bert_layer_1 = BertLayer(hidden_size = 128,
                          intermediate_size = 512,
                          num_heads = 2,
                          layer_num = 1,
-                         weight_file='weight/encoder.json')
+                         weight_file='weights/encoder.json')

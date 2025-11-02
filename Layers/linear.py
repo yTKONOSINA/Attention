@@ -12,12 +12,12 @@ class Linear:
         if w:
             self.w = Tensor(w)
         else:
-            self.w = [[random.random() for _ in range(n)]
-                        for _ in range(m)]
+            self.w = Tensor([[random.random() for _ in range(n)]
+                        for _ in range(m)])
         if b:
             self.b = Tensor(b)
         else:
-            self.b = [random.random() for _ in range(n)]
+            self.b = Tensor([random.random() for _ in range(n)])
     
     def forward(self, x : Tensor) -> Tensor:
         res = x @ self.w

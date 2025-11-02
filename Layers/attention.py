@@ -66,16 +66,16 @@ class BertLayer:
                  intermediate_size = 512, 
                  num_heads = 2,
                  layer_num = 0,
-                 weight_file = 'weight/encoder.json'):
+                 weight_file = 'weights/encoder.json'):
         
-        self._load_weights(weight_file, layer_num)
-
         self.attention = BertSelfAttention(hidden_size, num_heads)
         self.attention_norm = LayerNorm(hidden_size)
 
         self.intermediate = Linear(hidden_size, intermediate_size)
         self.output_dense = Linear(intermediate_size, hidden_size)
         self.output_norm = LayerNorm(hidden_size)
+
+        self._load_weights(weight_file, layer_num)
 
     def _load_weights(self, weight_file, layer_num):
         with open(weight_file, "r") as f:
