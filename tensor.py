@@ -1,3 +1,5 @@
+import math
+
 class Tensor:
     def __init__(self, data : list = None):
         self.tensor : list = []
@@ -164,30 +166,6 @@ class Tensor:
 
         raise NotImplementedError("permute supports up to 4D tensors only.")
 
-
-    def softmax_dim_0(self) -> "Tensor":
-
-        def exp(x, n_terms=20):
-            result = 0.0
-            factorial = 1
-            power = 1.0
-            for i in range(n_terms):
-                if i > 0:
-                    factorial *= i
-                    power *= x
-                result += power / factorial
-            return result
-
-        ans = []
-        eps = 1e-12
-        for row in self.tensor:
-            max_value = max(row)
-            exps = [exp(x - max_value) for x in row]
-            s = sum(exps)
-            ans.append([e / (s + eps) for e in exps])
-        
-        return Tensor(ans)
-
     # bmm function
 
     def transpose(self, dim1 : int, dim2 : int) -> "Tensor":
@@ -196,7 +174,33 @@ class Tensor:
         return self.permute(tuple(dims))
     
     def softmax(self, dim : int = -1) -> "Tensor":
+        """
+            Applies softmax along a given dimension.
+            Works for tensors up to the 4th dimension.
+        """
+
+        eps = 1e-12
+
+        def softmax_1d(array):
+            mx = max(array)
+            exps = [math.exp(x - mx) for x in array]
+            s = sum(exps)
+            return [e / (s + eps) for e in exps]
+
+        def apply_softmax(data, curr_dim, tar_dim):
+            if tar_dim == curr_dim:
+                return [softmax_1d(sample) for sample in data]
+            else:
+                return [apply_softmax(sample, curr_dim + 1, tar_dim)
+                        for sample in data] 
         
+        if dim < 0:
+            dim += len(self.shape)
+        
+        if len(self.shape) == 2 and dim == 1:
+            return Tensor([softmax_1d(row) for row in self.tensor])
+        else:
+            return Tensor(apply_softmax(self.tensor, 0, dim))
 
 if __name__ == "__main__":
     # a = Tensor([[1, 2], [3, 4]])
