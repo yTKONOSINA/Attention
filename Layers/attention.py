@@ -19,6 +19,7 @@ class BertSelfAttention:
 
         # Output projection
         self.dense = Linear(hidden_size, hidden_size)
+        self.norm = LayerNorm(hidden_size)
 
     def forward(self, X, mask):
         N, length, _ = X.shape
@@ -39,19 +40,21 @@ class BertSelfAttention:
         keys = keys.permute((0, 2, 1, 3))
         values = values.permute((0, 2, 1, 3))
         
-        scores = (queries @ keys.transpose_2d(-2, -1)) / math.sqrt(self.head_dim)
+        KT = keys.transpose(-2, -1)
+        scores = (queries @ KT)
+        scores = Tensor([[[(val / math.sqrt(self.head_dim)) for val in row] for row in batch]
+                         for batch in scores.tensor])
         if mask is not None:
-            scores = scores.masked_fill(mask == 0, float("-inf"))
+            scores = scores.masked_fill(mask, float("-inf"))
         attention = scores.softmax(dim=-1)
 
         output = attention @ values
         output = output.permute((0, 2, 1, 3)).reshape(N, length, self.hidden_size)
 
-        dense = Linear()
+        output = self.dense.forward(output)
     
-        # dense layer
-        # layer norm
-        return
+        output = self.norm.forward(output)
+        return output
     
 class BertLayer:
     def __init__(self, 
