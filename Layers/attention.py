@@ -6,7 +6,10 @@ import json
 from Layers.layernorm import LayerNorm
 
 class BertSelfAttention:
-    def __init__(self, hidden_size, num_heads):
+    def __init__(self,
+                 hidden_size,
+                 num_heads
+                 ):
         assert hidden_size % num_heads == 0, "hidden_size must be divisible by num_heads"
         self.hidden_size = hidden_size
         self.num_heads = num_heads
@@ -54,6 +57,7 @@ class BertSelfAttention:
         output = self.dense.forward(output)
     
         output = self.norm.forward(output)
+        
         return output
     
 class BertLayer:
@@ -64,14 +68,14 @@ class BertLayer:
                  layer_num = 0,
                  weight_file = 'weight/encoder.json'):
         
+        self._load_weights(weight_file, layer_num)
+
         self.attention = BertSelfAttention(hidden_size, num_heads)
         self.attention_norm = LayerNorm(hidden_size)
 
         self.intermediate = Linear(hidden_size, intermediate_size)
         self.output_dense = Linear(intermediate_size, hidden_size)
         self.output_norm = LayerNorm(hidden_size)
-        
-        self._load_weights(weight_file, layer_num)
 
     def _load_weights(self, weight_file, layer_num):
         with open(weight_file, "r") as f:

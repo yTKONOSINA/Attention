@@ -1,11 +1,23 @@
 from tensor import Tensor
+import random
 
 class Linear:
-    def __init__(self, m : int, n : int, data : float = 0):
+    def __init__(self,
+                  m : int,
+                  n : int,
+                  w : list = None,
+                  b : list = None):
         self.m = m
         self.n = n
-        self.w = Tensor([[data for i in range(n)] for j in range(m)])
-        self.b = Tensor([data for i in range(n)])
+        if w:
+            self.w = Tensor(w)
+        else:
+            self.w = [[random.random() for _ in range(n)]
+                        for _ in range(m)]
+        if b:
+            self.b = Tensor(b)
+        else:
+            self.b = [random.random() for _ in range(n)]
     
     def forward(self, x : Tensor) -> Tensor:
         res = x @ self.w
