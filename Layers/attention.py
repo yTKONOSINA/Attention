@@ -3,7 +3,7 @@ import math
 from Layers.linear import Linear
 from tensor import Tensor
 import json
-from layernorm import LayerNorm
+from Layers.layernorm import LayerNorm
 
 class BertSelfAttention:
     def __init__(self, hidden_size, num_heads):

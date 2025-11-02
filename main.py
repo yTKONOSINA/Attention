@@ -1,6 +1,6 @@
 from transformers import AutoTokenizer # Only tokenizer
 from embedding import embed
-from Layers.attention import Attention
+from Layers.attention import BertLayer
 from tensor import Tensor
 import json
 
@@ -51,6 +51,14 @@ embeddings = embed(tokens_list,
 
 print(embeddings.shape) # (batch, num of tokens, embedding dim = 128)
 
-at_layer_1 = Attention()
+bert_layer_0 = BertLayer(hidden_size = 128,
+                         intermediate_size = 512,
+                         num_heads = 2,
+                         layer_num = 0,
+                         weight_file='weight/encoder.json')
 
-at_layer_2 = Attention()
+bert_layer_1 = BertLayer(hidden_size = 128,
+                         intermediate_size = 512,
+                         num_heads = 2,
+                         layer_num = 1,
+                         weight_file='weight/encoder.json')
