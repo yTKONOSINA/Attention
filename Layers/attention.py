@@ -28,9 +28,9 @@ class BertSelfAttention:
         N, length, _ = X.shape
 
         # Q = XW_q + b_q, K = XW_k + b_k, V = XW_v + b_v
-        values = self.values.forward(X)
-        keys = self.keys.forward(X)
-        queries = self.queries.forward(X)
+        values = self.value.forward(X)
+        keys = self.key.forward(X)
+        queries = self.query.forward(X)
 
         # Attention(Q, K, V) = softmax(QK^t/sqrt(d_k))V
         # Output = Attention(Q, K, W)W_o + b_o
@@ -84,27 +84,36 @@ class BertLayer:
         prefix = f"bert.encoder.layer.{layer_num}."
 
         # Attention
-        self.attention.query.weight = Tensor(weights[prefix + "attention.self.query.weight"])
-        self.attention.query.bias = Tensor(weights[prefix + "attention.self.query.bias"])
-        self.attention.key.weight = Tensor(weights[prefix + "attention.self.key.weight"])
-        self.attention.key.bias = Tensor(weights[prefix + "attention.self.key.bias"])
-        self.attention.value.weight = Tensor(weights[prefix + "attention.self.value.weight"])
-        self.attention.value.bias = Tensor(weights[prefix + "attention.self.value.bias"])
-        self.attention.dense.weight = Tensor(weights[prefix + "attention.output.dense.weight"])
-        self.attention.dense.bias = Tensor(weights[prefix + "attention.output.dense.bias"])
+        query_weight = Tensor(weights[prefix + "attention.self.query.weight"]).transpose_2d()
+        self.attention.query.w = query_weight
+        self.attention.query.b = Tensor(weights[prefix + "attention.self.query.bias"])
+        
+        key_weight = Tensor(weights[prefix + "attention.self.key.weight"]).transpose_2d()
+        self.attention.key.w = key_weight
+        self.attention.key.b = Tensor(weights[prefix + "attention.self.key.bias"])
+        
+        value_weight = Tensor(weights[prefix + "attention.self.value.weight"]).transpose_2d()
+        self.attention.value.w = value_weight
+        self.attention.value.b = Tensor(weights[prefix + "attention.self.value.bias"])
+        
+        dense_weight = Tensor(weights[prefix + "attention.output.dense.weight"]).transpose_2d()
+        self.attention.dense.w = dense_weight
+        self.attention.dense.b = Tensor(weights[prefix + "attention.output.dense.bias"])
 
-        self.attention_norm.weight = Tensor(weights[prefix + "attention.output.LayerNorm.weight"])
-        self.attention_norm.bias = Tensor(weights[prefix + "attention.output.LayerNorm.bias"])
+        self.attention_norm.w = Tensor(weights[prefix + "attention.output.LayerNorm.weight"])
+        self.attention_norm.b = Tensor(weights[prefix + "attention.output.LayerNorm.bias"])
 
         # Feed-forward
-        self.intermediate.weight = Tensor(weights[prefix + "intermediate.dense.weight"])
-        self.intermediate.bias = Tensor(weights[prefix + "intermediate.dense.bias"])
+        intermediate_weight = Tensor(weights[prefix + "intermediate.dense.weight"]).transpose_2d()
+        self.intermediate.w = intermediate_weight
+        self.intermediate.b = Tensor(weights[prefix + "intermediate.dense.bias"])
 
-        self.output_dense.weight = Tensor(weights[prefix + "output.dense.weight"])
-        self.output_dense.bias = Tensor(weights[prefix + "output.dense.bias"])
+        output_dense_weight = Tensor(weights[prefix + "output.dense.weight"]).transpose_2d()
+        self.output_dense.w = output_dense_weight
+        self.output_dense.b = Tensor(weights[prefix + "output.dense.bias"])
 
-        self.output_norm.weight = Tensor(weights[prefix + "output.LayerNorm.weight"])
-        self.output_norm.bias = Tensor(weights[prefix + "output.LayerNorm.bias"])
+        self.output_norm.w = Tensor(weights[prefix + "output.LayerNorm.weight"])
+        self.output_norm.b = Tensor(weights[prefix + "output.LayerNorm.bias"])
     
 
     def forward(self, hidden_states, mask=None):
