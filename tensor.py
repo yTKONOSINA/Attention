@@ -201,11 +201,15 @@ class Tensor:
             return [e / (s + eps) for e in exps]
 
         def apply_softmax(data, curr_dim, tar_dim):
+            if not isinstance(data, list):
+                return data
             if tar_dim == curr_dim:
-                return [softmax_1d(sample) for sample in data]
+                if isinstance(data[0], list):
+                    return [apply_softmax(sample, curr_dim + 1, tar_dim) for sample in data]
+                else:
+                    return softmax_1d(data)
             else:
-                return [apply_softmax(sample, curr_dim + 1, tar_dim)
-                        for sample in data] 
+                return [apply_softmax(sample, curr_dim + 1, tar_dim)]
         
         if dim < 0:
             dim += len(self.shape)

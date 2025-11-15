@@ -52,7 +52,7 @@ class BertSelfAttention:
         attention = scores.softmax(dim=-1)
 
         output = attention @ values
-        output = output.permute((0, 2, 1, 3)).reshape(N, length, self.hidden_size)
+        output = output.permute((0, 2, 1, 3)).reshape((N, length, self.hidden_size))
 
         output = self.dense.forward(output)
     
