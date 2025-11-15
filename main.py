@@ -62,3 +62,6 @@ bert_layer_1 = BertLayer(hidden_size = 128,
                          num_heads = 2,
                          layer_num = 1,
                          weight_file='weights/encoder.json')
+output = bert_layer_0.forward(embeddings, mask)
+output = bert_layer_1.forward(output, mask)
+print(output.shape)
