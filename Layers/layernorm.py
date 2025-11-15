@@ -8,11 +8,17 @@ class LayerNorm:
                  b : list = None):
         self.m = n
         if w:
-            self.w = Tensor(w)
+            if isinstance(w, Tensor):
+                self.w = w
+            else:
+                self.w = Tensor(w)
         else:
-            self.w = Tensor(random.random() for _ in range(n))
+            self.w = Tensor([random.random() for _ in range(n)])
         if b:
-            self.b = Tensor(b)
+            if isinstance(b, Tensor):
+                self.b = b
+            else:
+                self.b = Tensor(b)
         else:
             self.b = Tensor([random.random() for _ in range(n)])
 
@@ -29,7 +35,9 @@ class LayerNorm:
             mean = sum(row)/len(row)
             var = sum((x - mean)**2 for x in row)/len(row)
             std = (var + eps) ** 0.5
+            w_vals = self.w.tensor if isinstance(self.w, Tensor) else self.w
+            b_vals = self.b.tensor if isinstance(self.b, Tensor) else self.b
             return [(x - mean) / std * w + b
-                        for x, w, b in zip(row, self.w.tensor, self.b.tensor)]
+                        for x, w, b in zip(row, w_vals, b_vals)]
 
         return Tensor([[norm_row(row) for row in sample] for sample in x.tensor])

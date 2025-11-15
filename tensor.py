@@ -25,6 +25,17 @@ class Tensor:
         if not isinstance(a, list):
             return a + b
         return [self._add_tensors(x, y) for x, y in zip(a, b)]
+    
+    def __mul__(self, other):
+        """Scalar multiplication"""
+        if isinstance(other, (int, float)):
+            def multiply(data, scalar):
+                if not isinstance(data, list):
+                    return data * scalar
+                return [multiply(x, scalar) for x in data]
+            return Tensor(multiply(self.tensor, other))
+        else:
+            raise TypeError(f"Only scalar multiplication is supported")
 
     def __matmul__(self, other: "Tensor") -> "Tensor":
         """
@@ -205,11 +216,11 @@ class Tensor:
                 return data
             if tar_dim == curr_dim:
                 if isinstance(data[0], list):
-                    return [apply_softmax(sample, curr_dim + 1, tar_dim) for sample in data]
+                    return [softmax_1d(sample) if not isinstance(sample, list) else apply_softmax(sample, curr_dim + 1, tar_dim) for sample in data]
                 else:
                     return softmax_1d(data)
             else:
-                return [apply_softmax(sample, curr_dim + 1, tar_dim)]
+                return [apply_softmax(sample, curr_dim + 1, tar_dim) for sample in data]
         
         if dim < 0:
             dim += len(self.shape)

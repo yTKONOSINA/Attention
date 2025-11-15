@@ -25,9 +25,11 @@ class Linear:
         def add_bias(data, bias):
             if not isinstance(data, list):
                 return data + bias
-            return [add_bias(x, bias) for x in data]
-            
-        assert len(res.shape) == len(self.b.shape), "Bias shape must match result shape"
+            if isinstance(data[0], list):
+                return [add_bias(row, bias) for row in data]
+            else:
+                return [data[i] + bias[i] for i in range(len(bias))]
+        
         res.tensor = add_bias(res.tensor, self.b.tensor)
         return res
 

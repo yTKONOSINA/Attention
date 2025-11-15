@@ -45,10 +45,18 @@ class BertSelfAttention:
         
         KT = keys.transpose(-2, -1)
         scores = (queries @ KT)
-        scores = Tensor([[[(val / math.sqrt(self.head_dim)) for val in row] for row in batch]
-                         for batch in scores.tensor])
+        # Scale by sqrt(head_dim)
+        scale = 1.0 / math.sqrt(self.head_dim)
+        scores = scores * scale
         if mask is not None:
-            scores = scores.masked_fill(mask, float("-inf"))
+            # Convert mask to Tensor - mask is [N, length]
+            mask_tensor = Tensor(mask)
+            expanded_mask = [[[[0 if (mask_tensor.tensor[b][i] == 0 or mask_tensor.tensor[b][j] == 0) else 1 
+                                for j in range(length)] 
+                               for i in range(length)] 
+                              for _ in range(self.num_heads)] 
+                             for b in range(N)]
+            scores = scores.masked_fill(Tensor(expanded_mask), float("-inf"))
         attention = scores.softmax(dim=-1)
 
         output = attention @ values
