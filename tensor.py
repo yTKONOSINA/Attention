@@ -35,7 +35,13 @@ class Tensor:
             Returns:
                 A @ B with the shape: (..., n, m)
                 (..., n, p) @ (..., p, m) -> (..., n, m)
+                (..., n, p) @ (p, m) -> (..., n, m) batch matrix multiplication
         """
+        if len(other.shape) == 2 and len(self.shape) > 2:
+            assert self.shape[-1] == other.shape[-2], \
+            f"Last dim of first must match second-to-last of second"
+            return Tensor(self._matmul(self.tensor, other.tensor))
+
         assert self.shape[:-2] == other.shape[:-2], \
         "Batch dimensions do not match!"
         assert self.shape[-1] == other.shape[-2], \
@@ -43,7 +49,10 @@ class Tensor:
         return Tensor(self._matmul(self.tensor, other.tensor))
 
     def _matmul(self, a, b):
-        if len(self._get_shape(a)) == 2 and len(self._get_shape(b)) == 2:
+        a_shape = self._get_shape(a)
+        b_shape = self._get_shape(b)
+        
+        if len(a_shape) == 2 and len(b_shape) == 2:
             m, n = len(a), len(a[0])
             n, p  = len(b), len(b[0])
             return [
@@ -53,8 +62,12 @@ class Tensor:
                 ]
                 for i in range(m)
             ]
-        else:
+        elif len(a_shape) > 2 and len(b_shape) == 2:
+            return [self._matmul(x, b) for x in a]
+        elif len(a_shape) == len(b_shape) and len(a_shape) > 2:
             return [self._matmul(x, y) for x, y in zip(a, b)]
+        else:
+            raise ValueError(f"Cannot multiply tensors with shapes")
 
 
     def cat(self, other : "Tensor") -> "Tensor":
@@ -170,7 +183,7 @@ class Tensor:
 
     def transpose(self, dim1 : int, dim2 : int) -> "Tensor":
         dims = list(range(len(self.shape)))
-        dims[dim1], dims[dim2] = dims[2], dims[1]
+        dims[dim1], dims[dim2] = dims[dim2], dims[dim1]
         return self.permute(tuple(dims))
     
     def softmax(self, dim : int = -1) -> "Tensor":
