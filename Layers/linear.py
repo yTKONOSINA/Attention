@@ -22,10 +22,13 @@ class Linear:
     def forward(self, x : Tensor) -> Tensor:
         res = x @ self.w
         
-        res.tensor = [
-            [row[i] + self.b.tensor[i] for i in range(self.n)]
-            for row in res.tensor
-        ]
+        def add_bias(data, bias):
+            if not isinstance(data, list):
+                return data + bias
+            return [add_bias(x, bias) for x in data]
+            
+        assert len(res.shape) == len(self.b.shape), "Bias shape must match result shape"
+        res.tensor = add_bias(res.tensor, self.b.tensor)
         return res
 
 if __name__ == "__main__":
