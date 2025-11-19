@@ -3,6 +3,10 @@ import os
 import sys
 import math
 
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
+
 from tensor import Tensor
 from Layers.linear import Linear
 from Layers.layernorm import LayerNorm
@@ -64,3 +68,18 @@ class Predictions:
         x = self.norm.forward(x)
         x = self.decoder.forward(x)
         return x
+
+if __name__ == "__main__":
+    import random
+
+    batch_size, seq_len, hidden_size = 2, 3, 128
+    x = Tensor([[[random.random()
+                for _ in range(hidden_size)]
+                for _ in range(seq_len)]
+                for _ in range(batch_size)])
+    
+    predictions = Predictions(hidden_size = hidden_size)
+    output = predictions.forward(x)
+    
+    print(f"Output shape: {output.shape}")
+    print(f"Output tensor: {output.tensor}")
