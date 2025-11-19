@@ -7,7 +7,11 @@ import json
 sentences = [
     "How are [MASK]?",
     "It is a [MASK] day.",
-    "He is a good [MASK]."
+    "He is a good [MASK].",
+    "Shakespeare wrote famous [MASK] like Hamlet.",
+    "The [MASK] War ended in 1945.",
+    "Python is a [MASK] language.",
+    "Machine [MASK] learns from data."
 ]
 
 # Loading the model and the tokenizer
