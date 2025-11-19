@@ -24,8 +24,23 @@ class Predictions:
 
             self._load_weights(weights_file)
     
-    def _load_weights(self, weights_file):
-        pass
+    def _load_weights(self, weights_file : str):
+        with open(weights_file, "r") as f:
+            weights = json.load(f)
+
+        dense = Tensor(weights["cls.predictions.transform.dense.weight"]).transpose_2d()
+        self.dense.w = dense
+        self.dense.b = Tensor(weights["cls.predictions.transform.dense.bias"])
+
+        norm = Tensor(weights["cls.predictions.transform.LayerNorm.weight"])
+        self.norm.w = norm
+        self.norm.b = Tensor(weights["cls.predictions.transform.LayerNorm.bias"])
+
+        decoder = Tensor(weights["cls.predictions.decoder.weight"]).transpose_2d()
+        self.decoder.w = decoder
+        self.decoder.b = Tensor(weights["cls.predictions.decoder.bias"])
+
+        self.bias = Tensor(weights["cls.predictions.bias"])
 
     def gelu(self, tensor: Tensor) -> Tensor:
 
@@ -38,3 +53,14 @@ class Predictions:
             return [apply_gelu(item) for item in data]
         
         return Tensor(apply_gelu(tensor.tensor))
+
+    def add_bias(self, x : Tensor) -> Tensor:
+        return x + self.bias
+
+    def forward(self, x : Tensor) -> Tensor:
+        x = self.add_bias(x)
+        x = self.dense.forward(x)
+        x = self.gelu(x)
+        x = self.norm.forward(x)
+        x = self.decoder.forward(x)
+        return x
