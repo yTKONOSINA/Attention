@@ -26,3 +26,15 @@ class Predictions:
     
     def _load_weights(self, weights_file):
         pass
+
+    def gelu(self, tensor: Tensor) -> Tensor:
+
+        def gelu_fn(x):
+            return 0.5 * x * (1 + math.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * x**3)))
+
+        def apply_gelu(data):
+            if not isinstance(data, list):
+                return gelu_fn(data)
+            return [apply_gelu(item) for item in data]
+        
+        return Tensor(apply_gelu(tensor.tensor))
