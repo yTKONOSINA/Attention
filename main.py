@@ -51,10 +51,7 @@ embeddings = embed(tokens_list,
                    Tensor(embeddings_dict['bert.embeddings.position_embeddings.weight']),
                    Tensor(embeddings_dict['bert.embeddings.token_type_embeddings.weight']),
                    Tensor(embeddings_dict['bert.embeddings.LayerNorm.weight']),
-                   Tensor(embeddings_dict['bert.embeddings.LayerNorm.bias']) 
-                )
-
-print(embeddings.shape) # (batch, num of tokens, embedding dim = 128)
+                   Tensor(embeddings_dict['bert.embeddings.LayerNorm.bias']))
 
 bert_layer_0 = BertLayer(hidden_size = 128,
                          intermediate_size = 512,
@@ -69,8 +66,29 @@ bert_layer_1 = BertLayer(hidden_size = 128,
                          weight_file='weights/encoder.json')
 output = bert_layer_0.forward(embeddings, mask)
 output = bert_layer_1.forward(output, mask)
-print(f"Bert Layer 1 output shape: {output.shape}")
 
 predictions = Predictions(hidden_size = 128)
-output = predictions.forward(output)
-print(f"Predictions output shape: {output.shape}")
+logits = predictions.forward(output)
+
+def top_k(scores, k):
+    scores_list = list(enumerate(scores))
+    scores_list.sort(key=lambda item: item[1], reverse=True)
+    return [idx for idx, _ in scores_list[:k]]
+
+k = 5
+logits_tensor = logits.tensor
+mask_token_id = tokenizer.mask_token_id # 103
+
+for batch_idx, token_ids in enumerate(tokens_list):
+    mask_positions = [pos for pos, token_id in enumerate(token_ids) if token_id == mask_token_id]
+    if not mask_positions:
+        continue
+
+    print(f"\nInput: {sentences[batch_idx]}")
+    print("Top predictions for [MASK]:")
+
+    for pos in mask_positions:
+        vocab_scores = logits_tensor[batch_idx][pos]
+        top_ids = top_k(vocab_scores, k)
+        top_tokens = [tokenizer.decode([token_id]).strip() for token_id in top_ids]
+        print(f"  Position {pos}: {', '.join(top_tokens)}")
