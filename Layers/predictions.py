@@ -42,9 +42,15 @@ class Predictions:
 
         decoder = Tensor(weights["cls.predictions.decoder.weight"]).transpose_2d()
         self.decoder.w = decoder
-        self.decoder.b = Tensor(weights["cls.predictions.decoder.bias"])
 
+        decoder_bias = Tensor(weights["cls.predictions.decoder.bias"])
         self.bias = Tensor(weights["cls.predictions.bias"])
+
+        # Hugging Face implementation is a bit different
+        if self.bias.tensor == decoder_bias.tensor:
+            self.decoder.b = self.bias
+        else:
+            self.decoder.b = decoder_bias
 
     def gelu(self, tensor: Tensor) -> Tensor:
 
@@ -58,16 +64,26 @@ class Predictions:
         
         return Tensor(apply_gelu(tensor.tensor))
 
-    def add_bias(self, x : Tensor) -> Tensor:
-        return x + self.bias
-
     def forward(self, x : Tensor) -> Tensor:
-        x = self.add_bias(x)
         x = self.dense.forward(x)
         x = self.gelu(x)
         x = self.norm.forward(x)
         x = self.decoder.forward(x)
+        if self.bias is not self.decoder.b:
+            x = self._add_bias(x)
         return x
+
+    def _add_bias(self, tensor: Tensor) -> Tensor:
+        bias_vals = self.bias.tensor
+
+        def add(data):
+            if not data:
+                return data
+            if not isinstance(data[0], list):
+                return [val + bias_vals[i] for i, val in enumerate(data)]
+            return [add(sub_data) for sub_data in data]
+
+        return Tensor(add(tensor.tensor))
 
 if __name__ == "__main__":
     import random
@@ -81,5 +97,5 @@ if __name__ == "__main__":
     predictions = Predictions(hidden_size = hidden_size)
     output = predictions.forward(x)
     
+    print(f"Input shape: {x.shape}")
     print(f"Output shape: {output.shape}")
-    print(f"Output tensor: {output.tensor}")

@@ -1,6 +1,7 @@
 from transformers import AutoTokenizer # Only tokenizer
 from embedding import embed
 from Layers.attention import BertLayer
+from Layers.predictions import Predictions
 from tensor import Tensor
 import json
 
@@ -68,4 +69,8 @@ bert_layer_1 = BertLayer(hidden_size = 128,
                          weight_file='weights/encoder.json')
 output = bert_layer_0.forward(embeddings, mask)
 output = bert_layer_1.forward(output, mask)
-print(output.shape)
+print(f"Bert Layer 1 output shape: {output.shape}")
+
+predictions = Predictions(hidden_size = 128)
+output = predictions.forward(output)
+print(f"Predictions output shape: {output.shape}")

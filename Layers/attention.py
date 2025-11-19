@@ -1,4 +1,3 @@
-import maths
 import math
 from Layers.linear import Linear
 from tensor import Tensor
