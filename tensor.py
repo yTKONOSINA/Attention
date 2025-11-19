@@ -206,6 +206,8 @@ class Tensor:
         eps = 1e-12
 
         def softmax_1d(array):
+            if all(x == float("-inf") for x in array):
+                return [0.0 for _ in array]
             mx = max(array)
             exps = [math.exp(x - mx) for x in array]
             s = sum(exps)
@@ -232,11 +234,11 @@ class Tensor:
 
     def masked_fill(self, mask: "Tensor", value: float) -> "Tensor":
         """
-            Replaces elements where mask == 0 with 'value'
+            Replaces elements where mask != 0 with 'value'
         """
         def fill(data, mask_data):
             if not isinstance(data, list):
-                return value if not mask_data else data
+                return value if mask_data else data
             return [fill(d, m) for d, m in zip(data, mask_data)]
 
         return Tensor(fill(self.tensor, mask.tensor))

@@ -21,7 +21,6 @@ class BertSelfAttention:
 
         # Output projection
         self.dense = Linear(hidden_size, hidden_size)
-        self.norm = LayerNorm(hidden_size)
 
     def forward(self, X, mask):
         N, length, _ = X.shape
@@ -48,12 +47,11 @@ class BertSelfAttention:
         scale = 1.0 / math.sqrt(self.head_dim)
         scores = scores * scale
         if mask is not None:
-            # Convert mask to Tensor - mask is [N, length]
             mask_tensor = Tensor(mask)
-            expanded_mask = [[[[0 if (mask_tensor.tensor[b][i] == 0 or mask_tensor.tensor[b][j] == 0) else 1 
-                                for j in range(length)] 
-                               for i in range(length)] 
-                              for _ in range(self.num_heads)] 
+            expanded_mask = [[[[1 if (mask_tensor.tensor[b][i] == 0 or mask_tensor.tensor[b][j] == 0) else 0
+                                for j in range(length)]
+                               for i in range(length)]
+                              for _ in range(self.num_heads)]
                              for b in range(N)]
             scores = scores.masked_fill(Tensor(expanded_mask), float("-inf"))
         attention = scores.softmax(dim=-1)
@@ -62,9 +60,6 @@ class BertSelfAttention:
         output = output.permute((0, 2, 1, 3)).reshape((N, length, self.hidden_size))
 
         output = self.dense.forward(output)
-    
-        output = self.norm.forward(output)
-        
         return output
     
 class BertLayer:
@@ -129,7 +124,21 @@ class BertLayer:
         hidden_states = self.attention_norm.forward(hidden_states + attn_out)
 
         # Feed-Forward + residual
-        ff_out = self.output_dense.forward(self.intermediate.forward(hidden_states))
+        intermediate_out = self.intermediate.forward(hidden_states)
+        intermediate_out = self.gelu(intermediate_out)
+        ff_out = self.output_dense.forward(intermediate_out)
         hidden_states = self.output_norm.forward(hidden_states + ff_out)
 
         return hidden_states
+
+    def gelu(self, tensor: Tensor) -> Tensor:
+
+        def gelu_fn(x):
+            return 0.5 * x * (1 + math.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * x**3)))
+
+        def apply_gelu(data):
+            if not isinstance(data, list):
+                return gelu_fn(data)
+            return [apply_gelu(item) for item in data]
+        
+        return Tensor(apply_gelu(tensor.tensor))
