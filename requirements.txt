@@ -1,0 +1,3 @@
+transformers==4.57.0
+numpy==2.3.5 # required for transformers
+matplotlib==3.10.7

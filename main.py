@@ -28,18 +28,18 @@ token_type_list = []
 # Tokenize with padding to the longest sentence
 inputs = tokenizer(
     sentences,
-    return_tensors="pt",
+    return_tensors=None,
     padding=True,
     truncation=True
 )
 
-tokens_list = inputs['input_ids'].tolist()
-token_type_list = inputs['token_type_ids'].tolist()
+tokens_list = inputs['input_ids']
+token_type_list = inputs['token_type_ids']
 
 # Since we are working with batches, we have to pad each sentence to the longest
 # one and create an output mask, otherwise the attention layer would consider
 # these padded elements
-mask = inputs['attention_mask'].tolist() 
+mask = inputs['attention_mask'] 
 
 # Get embedding weights
 with open("weights/embeddings.json", "r") as f:

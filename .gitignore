@@ -3,7 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 test/
-weights/
+weights/embeddings.json
+weights/encoder.json
+weights/predictions.json
 
 # C extensions
 *.so
