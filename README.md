@@ -31,7 +31,7 @@ pip install -r requirements.txt
 Run the helper script to download `bert-tiny` weights from Hugging Face and save them to the `weights/` directory.
 
 ```bash
-python weights/get_model_weights.py
+python3 weights/get_model_weights.py
 ```
 
 ### 4. Run the Model
@@ -39,7 +39,7 @@ python weights/get_model_weights.py
 Run the main script from the root directory to execute the model on example sentences and visualize attention maps.
 
 ```bash
-python python3 main.py
+python3 main.py
 ```
 
 ## Project Structure

@@ -1,3 +1,4 @@
-transformers==4.57.0
+transformers==4.57.0 # required for tokenization and obtaining model's weights
+torch==2.8.0 # required for transformers
 numpy==2.3.5 # required for transformers
-matplotlib==3.10.7
+matplotlib==3.10.7 # for visualization
