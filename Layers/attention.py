@@ -60,7 +60,7 @@ class BertSelfAttention:
         output = output.permute((0, 2, 1, 3)).reshape((N, length, self.hidden_size))
 
         output = self.dense.forward(output)
-        return output
+        return output, attention
     
 class BertLayer:
     def __init__(self, 
@@ -120,7 +120,7 @@ class BertLayer:
 
     def forward(self, hidden_states, mask=None):
         # Self-Attention + residual
-        attn_out = self.attention.forward(hidden_states, mask)
+        attn_out, attention_probs = self.attention.forward(hidden_states, mask)
         hidden_states = self.attention_norm.forward(hidden_states + attn_out)
 
         # Feed-Forward + residual
@@ -129,7 +129,7 @@ class BertLayer:
         ff_out = self.output_dense.forward(intermediate_out)
         hidden_states = self.output_norm.forward(hidden_states + ff_out)
 
-        return hidden_states
+        return hidden_states, attention_probs
 
     def gelu(self, tensor: Tensor) -> Tensor:
 

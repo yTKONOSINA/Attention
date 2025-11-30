@@ -2,14 +2,15 @@ from transformers import AutoTokenizer # Only tokenizer
 from embedding import embed
 from Layers.attention import BertLayer
 from Layers.predictions import Predictions
+from attention_visualization import visualize_attention
 from tensor import Tensor
 import json
 
 sentences = [
+    "Shakespeare wrote famous [MASK] like Hamlet.",
     "How are [MASK]?",
     "It is a [MASK] day.",
     "He is a good [MASK].",
-    "Shakespeare wrote famous [MASK] like Hamlet.",
     "The [MASK] War ended in 1945.",
     "Python is a [MASK] language.",
     "Machine [MASK] learns from data."
@@ -64,8 +65,14 @@ bert_layer_1 = BertLayer(hidden_size = 128,
                          num_heads = 2,
                          layer_num = 1,
                          weight_file='weights/encoder.json')
-output = bert_layer_0.forward(embeddings, mask)
-output = bert_layer_1.forward(output, mask)
+
+output, attn0 = bert_layer_0.forward(embeddings, mask)
+output, attn1 = bert_layer_1.forward(output, mask)
+
+VISUALIZE = True
+if VISUALIZE:
+    first_sentence_tokens = tokenizer.convert_ids_to_tokens(tokens_list[0])
+    visualize_attention([attn0, attn1], first_sentence_tokens)
 
 predictions = Predictions(hidden_size = 128)
 logits = predictions.forward(output)
