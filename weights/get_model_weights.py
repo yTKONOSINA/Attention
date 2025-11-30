@@ -7,7 +7,7 @@ model = AutoModelForMaskedLM.from_pretrained(model_name)
 state = model.state_dict()
 
 # Saving embedding weights
-embedding_file = "embeddings.json"
+embedding_file = "weights/embeddings.json"
 if not os.path.exists(embedding_file):
     embeddings = {}
     for k, v in state.items():
@@ -18,7 +18,7 @@ if not os.path.exists(embedding_file):
     print(f"Saved embeddings to {embedding_file}")
 
 # Saving encoder weights
-encoder_file = "encoder.json"
+encoder_file = "weights/encoder.json"
 if not os.path.exists(encoder_file):
     encoder = {}
     for k, v in state.items():
@@ -29,7 +29,7 @@ if not os.path.exists(encoder_file):
     print(f"Saved encoder weights to {encoder_file}")
 
 # Save prediction weights
-pred_file = "predictions.json"
+pred_file = "weights/predictions.json"
 if not os.path.exists(pred_file):
     predictions = {}
     for k, v in state.items():
