@@ -22,7 +22,7 @@ def visualize_attention(attention_weights, tokens):
             full_matrix = heads_attn[head_idx]
             attn_matrix = [row[:seq_len] for row in full_matrix[:seq_len]]
             
-            cax = ax.imshow(attn_matrix, cmap='viridis', aspect='auto')
+            cax = ax.imshow(attn_matrix, cmap='Reds', aspect='auto')
             
             ticks = range(seq_len)
             ax.set_xticks(ticks)

@@ -7,6 +7,7 @@ from tensor import Tensor
 import json
 
 sentences = [
+    "The [MASK] War ended in [MASK].",
     "Shakespeare wrote famous [MASK] like Hamlet.",
     "How are [MASK]?",
     "It is a [MASK] day.",
@@ -18,7 +19,7 @@ sentences = [
 
 # Loading the model and the tokenizer
 model_name = "prajjwal1/bert-tiny"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name, model_max_length=512)
 # model = AutoModelForMaskedLM.from_pretrained(model_name)
 
 tokens_list = []
@@ -95,7 +96,16 @@ for batch_idx, token_ids in enumerate(tokens_list):
     print("Top predictions for [MASK]:")
 
     for pos in mask_positions:
-        vocab_scores = logits_tensor[batch_idx][pos]
-        top_ids = top_k(vocab_scores, k)
-        top_tokens = [tokenizer.decode([token_id]).strip() for token_id in top_ids]
-        print(f"  Position {pos}: {', '.join(top_tokens)}")
+        vocab_logits = logits_tensor[batch_idx][pos]
+        
+        # Convert logits to probabilities using softmax
+        vocab_probs = Tensor(vocab_logits).softmax()
+        vocab_probs = vocab_probs.tensor
+        
+        top_ids = top_k(vocab_probs, k)
+        
+        print(f"Position {pos}:")
+        for token_id in top_ids:
+            token = tokenizer.decode([token_id]).strip()
+            prob = vocab_probs[token_id]
+            print(f"{token:<12} {prob:.2%}")
